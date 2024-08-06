@@ -7,7 +7,7 @@ let participants = groupMetadata.participants
 }
 handler.help = ['acciones']
 handler.tags = ['acciones']
-handler.command = /^(هديه|هدية)$/
+handler.command = /^(اهداء)$/
 
 handler.group = true
 

@@ -88,5 +88,5 @@ description: '🎶╎الـــــصـــــوت',
 };
 handler.help = ['ytsearch <نص>'];
 handler.tags = ['search'];
-handler.command = /^(ytsearch|yts|searchyt|buscaryt|videosearch|audiosearch|تيوب|بحث|اغنيه|فيد)$/i;
+handler.command = /^(ytsearch|yts|searchyt|buscaryt|videosearch|audiosearch|تيوب|بحث|ابحث)$/i;
 export default handler;

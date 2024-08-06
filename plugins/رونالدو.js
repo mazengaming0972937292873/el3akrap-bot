@@ -50,6 +50,6 @@ const handler = async (m, { conn, usedPrefix, command }) => {
     } 
 handler.help = ['cristianoronaldo', 'cr7', 'الدون'];
 handler.tags = ['internet'];
-handler.command = /^(الدون|رونالدو|كريستيانو)$/i;
+handler.command = /^(رونالدو|كريستيانو)$/i;
 
 export default handler;

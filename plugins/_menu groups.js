@@ -1,42 +1,67 @@
+import { createHash } from 'crypto';
+import PhoneNumber from 'awesome-phonenumber';
+import { canLevelUp, xpRange } from '../lib/levelling.js';
 import fetch from 'node-fetch';
-import { prepareWAMessageMedia } from '@whiskeysockets/baileys';
-const handler = async (m, {conn, usedPrefix, usedPrefix: _p, __dirname, text, isPrems}) => {
-//if (!db.data.chats[m.chat].modohorny && m.isGroup) throw `*[❗] Los comandos +18 están desactivados en este grupo, si es admin y desea activarlos use ${usedPrefix}enable modohorny*`; 
-  try {
-    const pp = imagen4;
-    const vn = './media/La biblia.mp3';
-    const d = new Date(new Date + 3600000);
-    const locale = 'es';
-    const week = d.toLocaleDateString(locale, {weekday: 'long'});
-    const date = d.toLocaleDateString(locale, {day: 'numeric', month: 'long', year: 'numeric'});
-    const _uptime = process.uptime() * 1000;
-    const uptime = clockString(_uptime);
-    const user = global.db.data.users[m.sender];
-    const {money, joincount} = global.db.data.users[m.sender];
-    const {exp, limit, level, role} = global.db.data.users[m.sender];
-    const rtotalreg = Object.values(global.db.data.users).filter((user) => user.registered == true).length;
-    const more = String.fromCharCode(8206);
-    const readMore = more.repeat(850);
-    const taguser = '@' + m.sender.split('@s.whatsapp.net')[0];
-    const doc = ['pdf', 'zip', 'vnd.openxmlformats-officedocument.presentationml.presentation', 'vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    const document = doc[Math.floor(Math.random() * doc.length)];
+import fs from 'fs';
+import moment from 'moment-timezone';
+import { promises } from 'fs';
+import { join } from 'path';
+const time = moment.tz('Africa/Egypt').format('HH');
+let wib = moment.tz('Africa/Egypt').format('HH:mm:ss');
+// import db from '../lib/database.js';
+
+let handler = async (m, { conn, usedPrefix, command }) => {
+    let d = new Date(new Date() + 3600000);
+    let locale = 'ar';
+    let week = d.toLocaleDateString(locale, { weekday: 'long' });
+    let date = d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+    let _uptime = process.uptime() * 1000;
+    let uptime = clockString(_uptime);
+    let who = m.quoted ? m.quoted.sender : m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
+    if (!(who in global.db.data.users)) throw `✳️ لم يتم العثور على المستخدم في قاعدة البيانات`;
+
+    let user = global.db.data.users[who];
+    let { money, joincount } = global.db.data.users[m.sender];
+    let { name, exp, diamond, lastclaim, registered, regTime, age, level, role, warn } = global.db.data.users[who];
+    let { min, xp, max } = xpRange(user.level, global.multiplier);
+    let username = conn.getName(who);
+    let rtotal = Object.entries(global.db.data.users).length || '0';
+    let math = max - xp;
+    let prem = global.prems.includes(who.split`@`[0]);
+    let sn = createHash('md5').update(who).digest('hex');
+    let rtotalreg = Object.values(global.db.data.users).filter(user => user.registered == true).length;
+    let more = String.fromCharCode(8206);
+    let readMore = more.repeat(850);
+    let taguser = conn.getName(m.sender); // تعديل هنا للحصول على الاسم بدلاً من الرقم
+    global.fcontact = { key: { fromMe: false, participant: `0@s.whatsapp.net`, remoteJid: 'status@broadcast' }, message: { contactMessage: { displayName: `${name}`, vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;a,;;;\nFN:${name}\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`}}};
+
+    // إرسال تفاعل React
+    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } });
+
+    // الانتظار لمدة ثانيتين
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    await conn.sendMessage(m.chat, { text: '*جاري تحضير قائمة الاوامر*' }, { quoted: global.fcontact });
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const img = './Menu.png';
     const str = `
-*⟣𓆩༺ 𝒁𝒆𝒛𝒐 𝑩𝒐𝒕 ❄ ༻𓆪⟢* 
-⟣┈┈┈⟢〘❄〙⟣┈┈┈⟢
-*༺ مـنـــور يــاقــلـبـي 〘 ${m.pushName} 〙༻*
-⟣┈┈┈⟢〘❄〙⟣┈┈┈⟢
-
-*⌬ ❛╏دي اوامر البوت متنساش ال ( . ) قبل اي امر*
-
-*⌬ ❛╏استمتع بالبوت بدون التسبب بازعاج للاعضاء*
-
-*⌬ ❛╏ممنوع طلب اشياء تخالف الشرع*
-
-*⌬ ❛╏ممنوع سب البوت اطلاقا باي الفاظ*
-
-*〘 مخالفة الشروط = حرمانك من البوت 〙*
-
-*⌬ ❛╏اذا كان هناك شئ لا يعجبك اكتب 〘 .ابلاغ  + مشكلتك〙*
+> *✧────[ 𝑾𝑬𝑳𝑪𝑶𝑴𝑬 ]────╮*
+> *┤ *مرحبا يا ${taguser}*
+> *┤ 🤴🏻 المطور: Mahmoud Mahmed*
+> *┤ #️⃣ الرقم: wa.me/201225655220*
+> *┤ ✅ الاصدار: 1.2.0*
+> *┤ 🎳 البادئة: •*
+> *┤ 🧜🏽‍♂️ المستخدمين: ${rtotalreg}*  
+> *┤────────────···*
+> *✧────[معـلـومـات الـمسـتـخـدم]────╮*
+> *┤ 🎩 *الاسـم: ${name}*
+> *┤ 🔃 المستوي: ${level}*
+> *┤────────────···* 
+> *✧────[ الـوقـت والـتـاريـخ ]────╮*
+> *┤ 📆 التاريخ: ${date}*
+> *┤ 📅 اليوم: ${week}*
+> *┤ 🚀 وقت النشاط: ${uptime}*
+> *┤────────────···*
 
 ⟣┈┈┈⟢〘❄〙⟣┈┈┈⟢
       *༺ قــســم الـجـروب ༻*
@@ -67,30 +92,25 @@ const handler = async (m, {conn, usedPrefix, usedPrefix: _p, __dirname, text, is
 │✯ ❯ .تغيرالوصف. 
 │✯ ❯ .تغيرالصوره. 
 *⟣𓆩༺ 𝒁𝒆𝒛𝒐 𝑩𝒐𝒕 ༻𓆪⟢*
-⟣┈┈┈┈⟢𓆩〘❄〙𓆪⟣┈┈┈┈⟢
-`.trim();
-    if (m.isGroup) {
-      await conn.sendMessage(m.chat, {image: pp, caption: str.trim(), mentions: [...str.matchAll(/@([0-9]{5,16}|0)/g)].map((v) => v[1] + '@s.whatsapp.net')}, {quoted: m});
-    //  await conn.sendFile(m.chat, vn, 'La biblia.mp3', null, m, true, {type: 'audioMessage', ptt: true});
-    } else {
-      const fkontak2 = {'key': {'participants': '0@s.whatsapp.net', 'remoteJid': 'status@broadcast', 'fromMe': false, 'id': 'Halo'}, 'message': {'contactMessage': {'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:Sy;Bot;;;\nFN:y\nitem1.TEL;waid=${m.sender.split('@')[0]}:${m.sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`}}, 'participant': '0@s.whatsapp.net'};
-      await conn.sendMessage(m.chat, {image:{url:'https://telegra.ph/file/f4f9d2420ac2b1072eb2e.jpg'}, caption: str.trim(), mentions: [...str.matchAll(/@([0-9]{5,16}|0)/g)].map((v) => v[1] + '@s.whatsapp.net')}, {quoted: fkontak2});
-      //await conn.sendFile(m.chat, vn, 'La biblia.mp3', null, m, true, {type: 'audioMessage', ptt: true});
-      await conn.sendMessage(m.chat, { react: { text: '📜', key: m.key } })
+⟣┈┈┈┈⟢𓆩〘❄〙𓆪⟣┈┈┈┈⟢`;
 
-    }
-  } catch {
-    conn.reply(m.chat, '*🐦*', m);
-  }
+    await conn.sendMessage(m.chat, { image: { url: img }, caption: str, mentions: [m.sender] }, { quoted: global.fcontact });
 };
-handler.command = /^(5)$/i;
-handler.exp = 50;
-handler.fail = null;
-export default handler;
 
 function clockString(ms) {
-  const h = isNaN(ms) ? '--' : Math.floor(ms / 3600000);
-  const m = isNaN(ms) ? '--' : Math.floor(ms / 60000) % 60;
-  const s = isNaN(ms) ? '--' : Math.floor(ms / 1000) % 60;
-  return [h, m, s].map((v) => v.toString().padStart(2, 0)).join(':');
-                                                                                                                                                                                                                                                                      }
+    let h = Math.floor(ms / 3600000);
+    let m = Math.floor((ms % 3600000) / 60000);
+    let s = Math.floor((ms % 60000) / 1000);
+    return [h, m, s].map(v => v.toString().padStart(2, 0)).join(':');
+}
+
+handler.help = ['menu'];
+handler.tags = ['main'];
+handler.command = /^(5)$/i;
+handler.owner = false;
+handler.mods = false;
+handler.premium = false;
+handler.group = false;
+handler.private = false;
+
+export default handler;

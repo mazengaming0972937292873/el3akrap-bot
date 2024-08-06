@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-let timeout = 6000,
-  poin = 4999;
+let timeout = 60000,
+  poin = 100000;
 const handler = async (m, {
   conn,
   command,
@@ -20,7 +20,7 @@ const handler = async (m, {
       delete conn.tebaklogo[id];
   }, timeout)];
 };
-handler.help = ["tebaklogo"], handler.tags = ["game"], handler.command = /^tebaklogo|لوجو/i;
+handler.help = ["tebaklogo"], handler.tags = ["game"], handler.command = /^tebaklogo|لوجوهات/i;
 export default handler;
 const buttons = [
   ["Hint", "/hlog"],

@@ -6,7 +6,7 @@ let handler = async (m, { conn, args, usedPrefix, command, isOwner, isPrems }) =
 	var limit
      if((isOwner || isPrems)) limit = 1200
      else limit = 100
-   if (!args[0]) throw `*✳️ أدخل رابط ميديافاير بجوار الأمر*`
+   if (!args[0]) throw `*✳️ أدخـل الـرابــط بـجانـب الأمــر*`
     if (!args[0].match(/mediafire/gi)) throw `❎ الرابط غير صحيح`
     await conn.sendMessage(m.chat, { react: { text: '🤌🏻', key: m.key } })
 
@@ -17,9 +17,9 @@ let handler = async (m, { conn, args, usedPrefix, command, isOwner, isPrems }) =
     let { url, url2, filename, ext, aploud, filesize, filesizeH } = res
     let isLimit = (isPrems || isOwner ? limit : limit) * 1012 < filesize
     let caption = `
-   ≡ *ميديافاير*
-
-▢ *الرقم:* ${filename}
+       ≡ *ميديافاير* ≡
+   
+   ▢ *الرقم:* ${filename}
 ▢ *الحجم:* ${filesizeH}
 ▢ *الامتداد:* ${ext}
 ▢ *تم التحميل:* ${aploud}

@@ -1,8 +1,8 @@
 let handler = async (m, { conn, usedPrefix, __dirname, text, isPrems }) => {
 
-    const vn = './media/يابضاني.mp3';
+    const vn = './media/يبضاني.mp3';
     conn.sendPresenceUpdate('recording', m.chat);
-    conn.sendMessage(m.chat, {audio: {url: vn}, ptt: true, mimetype: 'audio/mpeg', fileName: `يابضاني.mp3`}, {quoted: m});
+    conn.sendMessage(m.chat, {audio: {url: vn}, ptt: true, mimetype: 'audio/mpeg', fileName: `يبضاني.mp3`}, {quoted: m});
 };
 
 handler.help = ['notification']

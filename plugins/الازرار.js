@@ -1,49 +1,72 @@
-import { prepareWAMessageMedia, generateWAMessageFromContent, getDevice } from '@whiskeysockets/baileys';
-import moment from 'moment-timezone';
+import pkg from '@whiskeysockets/baileys';
+const { generateWAMessageFromContent, proto, prepareWAMessageMedia } = pkg;
 
-let handler = async (m, { conn, args, usedPrefix, command }) => {
-    const taguser = '@' + m.sender.split("@s.whatsapp.net")[0];
-    const time = moment.tz('Africa/Egypt').format('HH');
-    let wib = moment.tz('Africa/Cairo').format('HH:mm:ss');
-    let date = new Date().toLocaleDateString('en-EG', { day: 'numeric', month: 'long', year: 'numeric' });
+function clockString(ms) {
+    let h = Math.floor(ms / 3600000);
+    let m = Math.floor(ms % 3600000 / 60000);
+    let s = Math.floor(ms % 60000 / 1000);
+    return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+}
+
+const handler = async (m, {conn, usedPrefix, usedPrefix: _p, __dirname, text, isPrems}) => {
+    let d = new Date(new Date() + 3600000);
+    let locale = 'ar';
+    let week = d.toLocaleDateString(locale, { weekday: 'long' });
+    let date = d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+    let _uptime = process.uptime() * 1000;
+    let uptime = clockString(_uptime);
+    let user = global.db.data.users[m.sender];
+    let name = conn.getName(m.sender);
+    let { money, joincount, diamond } = user;
+    let { exp, limit, level, role } = user;
+    let rtotalreg = Object.values(global.db.data.users).filter(user => user.registered === true).length;
+    let more = String.fromCharCode(8206);
+    let readMore = more.repeat(850);
+    let who = m.mentionedJid && m.mentionedJid[0] ? m.mentionedJid[0] : m.fromMe ? conn.user.jid : m.sender;
+    let taguser = '@' + m.sender.split("@s.whatsapp.net")[0];
 
     await conn.sendMessage(m.chat, { react: { text: '📂', key: m.key } });
 
-    // قائمة عناوين URL للصور
     const images = [
         'https://telegra.ph/file/a79388f9fa9385f59d6a3.png',
         'https://telegra.ph/file/9c5f3db7081f5fc0f8ad2.jpg',
         'https://telegra.ph/file/187d2833c018e15d866c4.jpg',
-        'https://telegra.ph/file/f4f9d2420ac2b1072eb2e.jpg'// أضف عنوان URL ثالث هنا
+        'https://telegra.ph/file/f4f9d2420ac2b1072eb2e.jpg' // أضف عنوان URL ثالث هنا
     ];
 
-    // اختيار عشوائي لعنوان URL من القائمة
     const randomImage = images[Math.floor(Math.random() * images.length)];
 
-    // إعداد رسالة الوسائط
     var messa = await prepareWAMessageMedia({ image: { url: randomImage } }, { upload: conn.waUploadToServer });
-
+await conn.sendMessage(m.chat, { text: '*جاري تحضير قائمة الاوامر*' }, { quoted: global.fcontact });
+    await new Promise(resolve => setTimeout(resolve, 1000));
     conn.relayMessage(m.chat, {
         viewOnceMessage: {
             message: {
                 interactiveMessage: {
                     body: {
-                        text: `┈┈┈┈┈⟢┈┈┈⟣┈┈┈┈┈┈┈⟢
-*🐉✬⃝╿↵ مرحــبـا ⌊ ${m.pushName} ⌉*
-── • ◈ • ──
-
-┏━━🤖 *『』ī معلومات البوت ī《* 🤖━━┓
-┃ ✨  *اسـم البـوت: 𝒁𝒆𝒛𝒐 𝑩𝒐𝒕*
-┃ 💻  *المـنصـة:* 𝑯𝑬𝑹𝑶𝑲𝑼💀 
-┃ 📍  *رقم المطور: 201508628077*
-┃ 📚  *اسم المطور: 『➳ᴹᴿ᭄𝒁𝒆𝒛𝒐➳ᴹᴿ᭄』* 
-┗━━━━━━━━━━━━━┛
-
-┏━━⏰ *『』التاريخ والوقت《* ⏰━┓
-┃ 📆  *تـاريـخ اليـوم:* 『』${date}《 
-┃ ⏲️  *الـوقـت الـحالـي:* 『』${wib}《 
-┗━━━━━━━━━━━━━┛
-⟣┈┈┈┈┈┈⟢┈┈┈⟣┈┈┈┈┈┈┈⟢`
+                        text: `> *✧────[ 𝑾𝑬𝑳𝑪𝑶𝑴𝑬 ]────╮*
+> *┤ *مرحبا يا ${taguser}*
+> *┤ 🤴🏻 المطور: Mahmoud Mahmed*
+> *┤ #️⃣ الرقم: wa.me/201225655220*
+> *┤ ✅ الاصدار: 1.2.0*
+> *┤ 🎳 البادئة: •*
+> *┤ 🧜🏽‍♂️ المستخدمين: ${rtotalreg}*  
+> *┤────────────···*
+> *✧────[معـلـومـات الـمسـتـخـدم]────╮*
+> *┤ 🎩 *الاسـم: ${name}*
+> *┤ 🔃 المستوي: ${level}*
+> *┤ 🏆 *الـرتبة: ${role}*
+> *┤ 🎮 *الخبـرة: ${exp}* 
+> *┤ 💎 *الألـماس: ${diamond}* 
+> *┤ 🪙 *تربو كوينز: ${money}*
+> *┤ 🎟️ *الرموز: ${joincount}*
+> *┤ 🌟 *الـبـرﯾـمـيـوم: ${user.premiumTime > 0 ? 'مـمـيز✅' : (isPrems ? 'مـمـيز ✅' : 'عـادي ❌') || ''}* 
+> *┤────────────···* 
+> *✧────[ الـوقـت والـتـاريـخ ]────╮*
+> *┤ 📆 التاريخ: ${date}*
+> *┤ 📅 اليوم: ${week}*
+> *┤ 🚀 وقت النشاط: ${uptime}*
+> *┤────────────···*`
                     },
                     footer: {
                         text: 'ᴹᴿ᭄𝒁𝒆𝒛𝒐ᴹᴿ᭄'
@@ -106,13 +129,12 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
                                                     description: '',
                                                     id: '.7',
                                                 },
-{
+                                                {
                                                     header: '『』MENU《',
                                                     title: '⌬ ❛╏شـرح الـالـقـاب',
                                                     description: '',
                                                     id: '.3',
                                                 },
-
                                                 {
                                                     header: '『』MENU《',
                                                     title: '⌬ ❛╏شروط',
